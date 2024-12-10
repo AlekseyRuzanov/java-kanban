@@ -1,6 +1,3 @@
-import java.util.*;
-
-
 public class Main {
     public static void main(String[] args) {
         Manager manager = new Manager();
@@ -21,6 +18,7 @@ public class Main {
         Epic epic4 = new Epic("Обновленный Эпик 2", "Описание Эпика 2");
         epic4.setId(4);
         epic4.setStatus(Status.IN_PROGRESS);
+
         //Проверка метода createEpic
         manager.createEpic(epic1);
         manager.createEpic(epic2);
@@ -67,14 +65,22 @@ public class Main {
         manager.updateEpic(epic3);
         manager.updateEpic(epic4);
         System.out.println("ТЕСТ 5. Вывод списка обновленных Эпиков");
-        System.out.println(manager.getEpicById(3));
-        System.out.println(manager.getEpicById(4));
+        try {
+            System.out.println(manager.getEpicById(3));
+            System.out.println(manager.getEpicById(4));
+        } catch (InvalidInputException e) {
+            System.out.println("Invalid input: " + e.getMessage());
+        }
         System.out.println();
 
         //Проверка метода updateTask и getTaskById
         manager.updateTask(task3);
         System.out.println("ТЕСТ 6. Вывод обновленной Задачи 1");
-        System.out.println(manager.getTaskById(1));
+        try {
+            System.out.println(manager.getTaskById(1));
+        } catch (InvalidInputException e) {
+            System.out.println("Invalid input: " + e.getMessage());
+        }
         System.out.println();
 
         //Проверка метода updateSubTask, метода getSubTaskById и метода calculateEpicStatus - метода пересчета статуса эпиков
@@ -82,9 +88,13 @@ public class Main {
         manager.updateSubTask(subTask5);
         manager.updateSubTask(subTask6);
         System.out.println("ТЕСТ 7. Вывод обновленных Подзадач");
-        System.out.println(manager.getSubTaskById(5));
-        System.out.println(manager.getSubTaskById(6));
-        System.out.println(manager.getSubTaskById(7));
+        try {
+            System.out.println(manager.getSubTaskById(5));
+            System.out.println(manager.getSubTaskById(6));
+            System.out.println(manager.getSubTaskById(7));
+        } catch (InvalidInputException e) {
+            System.out.println("Invalid input: " + e.getMessage());
+        }
         System.out.println();
         System.out.println("ТЕСТ 8. Вывод Эпиков с обновленными статусами:");
         System.out.println(manager.getAllEpics());
@@ -92,7 +102,11 @@ public class Main {
         //Проверка метода deleteSubTaskById
         manager.deleteSubTaskById(7);
         System.out.println("ТЕСТ 9. Вывод удаленной Подзадачи");
-        System.out.println(manager.getSubTaskById(7));
+        try {
+            System.out.println(manager.getSubTaskById(7));
+        } catch (InvalidInputException e) {
+            System.out.println("Invalid input: " + e.getMessage());
+        }
         System.out.println();
         System.out.println("ТЕСТ 10. Вывод Эпиков с обновленными статусами:");
         System.out.println(manager.getAllEpics());
@@ -100,9 +114,13 @@ public class Main {
         //Проверка метода deleteAllSubTasks
         manager.deleteAllSubTasks();
         System.out.println("ТЕСТ 11. Вывод удаленных Подзадач");
-        System.out.println(manager.getSubTaskById(5));
-        System.out.println(manager.getSubTaskById(6));
-        System.out.println(manager.getSubTaskById(7));
+        try {
+            System.out.println(manager.getSubTaskById(5));
+            System.out.println(manager.getSubTaskById(6));
+            System.out.println(manager.getSubTaskById(7));
+        } catch (InvalidInputException e) {
+            System.out.println("Invalid input: " + e.getMessage());
+        }
         System.out.println();
         System.out.println("ТЕСТ 12. Вывод Эпиков с обновленными статусами:");
         System.out.println(manager.getAllEpics());
@@ -114,6 +132,12 @@ public class Main {
         System.out.println();
         System.out.println("ТЕСТ 14. Вывод Подзадач, связанных с удаленными Эпиками:");
         System.out.println(manager.getAllSubTasks());
+
+        //Проверка метода getSubTaskByEpicId
+        System.out.println("ТЕСТ 15. Вывод списка всех Подзадач по номеру Эпика (подзадачи отсутствуют в эпике):");
+        System.out.println(manager.getSubTaskByEpicId(3));
+        System.out.println(manager.getSubTaskByEpicId(4));
+        System.out.println();
     }
 }
 
