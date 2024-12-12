@@ -1,3 +1,7 @@
+package Tasks;
+
+import Enums.Status;
+
 public class Task {
     protected String name;
     protected String description;
@@ -10,7 +14,7 @@ public class Task {
         status = Status.NEW;
     }
 
-    protected void setId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -18,7 +22,7 @@ public class Task {
         return this.id;
     }
 
-    protected void setStatus(Status status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -28,7 +32,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "Tasks.Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

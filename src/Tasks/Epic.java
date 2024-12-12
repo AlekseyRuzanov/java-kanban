@@ -1,3 +1,5 @@
+package Tasks;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,21 +18,9 @@ public class Epic extends Task {
         epicSubTasks = newEpicSubTasks;
     }
 
-    public void addEpicSubTasks(Integer subTaskId) {
-        epicSubTasks.add(subTaskId);
-    }
-
-    public void deleteEpicSubTasks(Integer id) {
-        epicSubTasks.remove(id);
-    }
-
-    public void deleteAllEpicSubTasks() {
-        epicSubTasks.clear();
-    }
-
     @Override
     public String toString() {
-        return "Epic{" +
+        return "Tasks.Epic{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

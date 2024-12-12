@@ -1,3 +1,5 @@
+package Tasks;
+
 public class SubTask extends Task {
     protected Integer linkedEpicId;
 
@@ -5,8 +7,8 @@ public class SubTask extends Task {
         super(name, description);
     }
 
-    protected void setlinkedEpicId(Integer id) {
-        linkedEpicId = id;
+    public void setlinkedEpicId(Integer epicId) {
+        linkedEpicId = epicId;
     }
 
     public Integer getLinkedEpicId() {
@@ -15,7 +17,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" +
+        return "Tasks.SubTask{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

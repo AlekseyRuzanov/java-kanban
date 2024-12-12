@@ -1,10 +1,18 @@
+package Manager;
+
+import Enums.Status;
+import Tasks.Epic;
+import Tasks.SubTask;
+import Tasks.Task;
+import Exceptions.InvalidInputException;
+
 import java.util.*;
 
 public class Manager {
-    protected Map<Integer, Epic> epics = new HashMap<>();
+    private Map<Integer, Epic> epics = new HashMap<>();
     Map<Integer, Task> tasks = new HashMap<>();
     Map<Integer, SubTask> subTasks = new HashMap<>();
-    protected static int counter = 0;
+    private static int counter = 0;
 
     public void createEpic(Epic epic) {
         ++counter;
@@ -26,7 +34,7 @@ public class Manager {
         subTask.setId(counter);
         subTask.setlinkedEpicId(epicId);
         subTasks.put(subTask.getId(), subTask);
-        epics.get(epicId).addEpicSubTasks(subTask.getId());
+        linkSubTaskToEpic(subTask.getId(), epicId);
         calculateEpicStatus(epicId);
     }
 
@@ -41,8 +49,8 @@ public class Manager {
     }
 
     public void updateSubTask(SubTask subTask) {
-        Integer linkToEpic = subTasks.get(subTask.getId()).getLinkedEpicId();
-        subTask.setlinkedEpicId(linkToEpic); //переносим связь с эпиком со старой сабтаски на новую
+        Integer epicId = subTasks.get(subTask.getId()).getLinkedEpicId();
+        subTask.setlinkedEpicId(epicId); //переносим связь с эпиком со старой сабтаски на новую
         subTasks.put(subTask.getId(), subTask);
         calculateEpicStatus(subTask.getLinkedEpicId());
     }
@@ -103,9 +111,7 @@ public class Manager {
 
     public void deleteAllSubTasks() {
         subTasks.clear();
-        for (Epic epic : epics.values()) {
-            epic.deleteAllEpicSubTasks();
-        }
+        deleteAllEpicSubTasks();
         calculateEpicStatus();
     }
 
@@ -121,10 +127,10 @@ public class Manager {
     }
 
     public void deleteSubTaskById(Integer subTaskId) {
-        Integer linkedEpicId = subTasks.get(subTaskId).getLinkedEpicId();
+        Integer epicId = subTasks.get(subTaskId).getLinkedEpicId();
         subTasks.remove(subTaskId);
-        epics.get(linkedEpicId).deleteEpicSubTasks(subTaskId);
-        calculateEpicStatus(linkedEpicId);
+        deleteEpicSubTasks(subTaskId, epicId);
+        calculateEpicStatus(epicId);
     }
 
     private void calculateEpicStatus(Integer epicId) {
@@ -143,9 +149,7 @@ public class Manager {
             }
         }
 
-        if (isAllNew && epics.get(epicId).getStatus().equals(Status.NEW)) {
-            return;
-        } else if (isAllNew && !epics.get(epicId).getStatus().equals(Status.NEW)) {
+        if (isAllNew && !epics.get(epicId).getStatus().equals(Status.NEW)) {
             epics.get(epicId).setStatus(Status.NEW);
         } else if (isAllDone) {
             epics.get(epicId).setStatus(Status.DONE);
@@ -159,4 +163,22 @@ public class Manager {
             epics.get(epicId).setStatus(Status.NEW);
         }
     }
+
+
+    public void linkSubTaskToEpic(Integer subTaskId, Integer epicId) {
+        if (!epics.get(epicId).getEpicSubTasks().contains(subTaskId)) {
+            epics.get(epicId).getEpicSubTasks().add(subTaskId);
+        }
+    }
+
+    public void deleteEpicSubTasks(Integer subTaskId, Integer epicId) {
+        epics.get(epicId).getEpicSubTasks().remove(subTaskId);
+    }
+
+    public void deleteAllEpicSubTasks() {
+        for (Epic epic : epics.values()) {
+            epic.getEpicSubTasks().clear();
+        }
+    }
+
 }
