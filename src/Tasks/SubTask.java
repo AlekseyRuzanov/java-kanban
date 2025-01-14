@@ -9,7 +9,7 @@ public class SubTask extends Task {
         super(name, description);
     }
 
-    public void setlinkedEpicId(Integer epicId) {
+    public void setLinkedEpicId(Integer epicId) {
         linkedEpicId = epicId;
     }
 

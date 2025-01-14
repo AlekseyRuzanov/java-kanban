@@ -41,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         ++counter;
         subTask.setId(counter);
-        subTask.setlinkedEpicId(epicId);
+        subTask.setLinkedEpicId(epicId);
         subTasks.put(subTask.getId(), subTask);
         linkSubTaskToEpic(subTask.getId(), epicId);
         calculateEpicStatus(epicId);
@@ -49,7 +49,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) throws InvalidInputException {
-        if (tasks.get(task.getId()) == null) {
+        if (!tasks.containsKey(task.getId())) {
             throw new InvalidInputException("Задача не найдена");
         }
         tasks.put(task.getId(), task);
@@ -57,7 +57,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic epic) throws InvalidInputException {
-        if (epics.get(epic.getId()) == null) {
+        if (!epics.containsKey(epic.getId())) {
             throw new InvalidInputException("Эпик не найден");
         }
         epic.setEpicSubTasks(epics.get(epic.getId()).getEpicSubTasks()); //Переносим список сабтасок со старого эпика на новый
@@ -67,11 +67,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubTask(SubTask subTask) throws InvalidInputException {
-        if (subTasks.get(subTask.getId()) == null) {
+        if (!subTasks.containsKey(subTask.getId())) {
             throw new InvalidInputException("Подзадача не найдена");
         }
         Integer epicId = subTasks.get(subTask.getId()).getLinkedEpicId();
-        subTask.setlinkedEpicId(epicId); //переносим связь с эпиком со старой сабтаски на новую
+        subTask.setLinkedEpicId(epicId); //переносим связь с эпиком со старой сабтаски на новую
         subTasks.put(subTask.getId(), subTask);
         calculateEpicStatus(subTask.getLinkedEpicId());
     }
@@ -94,7 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<SubTask> getSubTasksByEpicId(Integer epicId) throws InvalidInputException {
         List<SubTask> allSubTasksListFromEpic = new LinkedList<>();
-        if (epics.get(epicId) == null) {
+        if (!epics.containsKey(epicId)) {
             throw new InvalidInputException("Эпик не найден");
         }
         for (Integer id : epics.get(epicId).getEpicSubTasks()) {
@@ -105,7 +105,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(Integer taskId) throws InvalidInputException {
-        if (tasks.get(taskId) == null) {
+        if (!tasks.containsKey(taskId)) {
             throw new InvalidInputException("Задача не найдена");
         }
         historyManager.addTask(tasks.get(taskId));
@@ -114,7 +114,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicById(Integer epicId) throws InvalidInputException {
-        if (epics.get(epicId) == null) {
+        if (!epics.containsKey(epicId)) {
             throw new InvalidInputException("Эпик не найден");
         }
         historyManager.addTask(epics.get(epicId));
@@ -123,7 +123,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubTaskById(Integer subTaskId) throws InvalidInputException {
-        if (subTasks.get(subTaskId) == null) {
+        if (!subTasks.containsKey(subTaskId)) {
             throw new InvalidInputException("Подзадача не найдена");
         }
         historyManager.addTask(subTasks.get(subTaskId));
@@ -150,7 +150,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteEpicById(Integer epicId) throws InvalidInputException {
-        if (epics.get(epicId) == null) {
+        if (!epics.containsKey(epicId)) {
             throw new InvalidInputException("Эпик не найден");
         }
         for (Integer subTaskId : epics.get(epicId).getEpicSubTasks()) {
@@ -161,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskById(Integer taskId) throws InvalidInputException {
-        if (tasks.get(taskId) == null) {
+        if (!tasks.containsKey(taskId)) {
             throw new InvalidInputException("Задача не найдена");
         }
         tasks.remove(taskId);
@@ -169,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTaskById(Integer subTaskId) throws InvalidInputException {
-        if (subTasks.get(subTaskId) == null) {
+        if (!subTasks.containsKey(subTaskId)) {
             throw new InvalidInputException("Подзадача не найдена");
         }
         Integer epicId = subTasks.get(subTaskId).getLinkedEpicId();
@@ -196,25 +196,18 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         boolean isNew = false;
-        boolean isInProgress = false;
         boolean isDone = false;
         if (statusDone == 0 && statusInProgress == 0 && statusNew != 0) {
             isNew = true;
         } else if (statusDone != 0 && statusInProgress == 0 && statusNew == 0) {
             isDone = true;
-            isNew = false;
-            isInProgress = false;
-        } else {
-            isNew = false;
-            isDone = false;
-            isInProgress = true;
         }
 
         if (isNew) {
             epics.get(epicId).setStatus(Status.NEW);
         } else if (isDone) {
             epics.get(epicId).setStatus(Status.DONE);
-        } else if (isInProgress) {
+        } else {
             epics.get(epicId).setStatus(Status.IN_PROGRESS);
         }
     }
