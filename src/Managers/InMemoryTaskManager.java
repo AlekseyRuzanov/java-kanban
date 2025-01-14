@@ -1,4 +1,4 @@
-package Manager;
+package Managers;
 
 import Enums.Status;
 import Tasks.Epic;
@@ -8,24 +8,33 @@ import Exceptions.InvalidInputException;
 
 import java.util.*;
 
-public class Manager {
+public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Epic> epics = new HashMap<>();
-    Map<Integer, Task> tasks = new HashMap<>();
-    Map<Integer, SubTask> subTasks = new HashMap<>();
+    private Map<Integer, Task> tasks = new HashMap<>();
+    private Map<Integer, SubTask> subTasks = new HashMap<>();
+    private HistoryManager historyManager = Managers.getDefaultHistory();
     private static int counter = 0;
 
-    public void createEpic(Epic epic) {
-        ++counter;
-        epic.setId(counter);
-        epics.put(epic.getId(), epic);
+    @Override
+    public int getCounter() {
+        return counter;
     }
 
+    @Override
     public void createTask(Task task) {
         ++counter;
         task.setId(counter);
         tasks.put(task.getId(), task);
     }
 
+    @Override
+    public void createEpic(Epic epic) {
+        ++counter;
+        epic.setId(counter);
+        epics.put(epic.getId(), epic);
+    }
+
+    @Override
     public void createSubTask(SubTask subTask, Integer epicId) {
         if (!epics.containsKey(epicId)) {
             return;
@@ -38,6 +47,15 @@ public class Manager {
         calculateEpicStatus(epicId);
     }
 
+    @Override
+    public void updateTask(Task task) throws InvalidInputException {
+        if (tasks.get(task.getId()) == null) {
+            throw new InvalidInputException("Задача не найдена");
+        }
+        tasks.put(task.getId(), task);
+    }
+
+    @Override
     public void updateEpic(Epic epic) throws InvalidInputException {
         if (epics.get(epic.getId()) == null) {
             throw new InvalidInputException("Эпик не найден");
@@ -47,13 +65,7 @@ public class Manager {
         calculateEpicStatus(epic.getId());
     }
 
-    public void updateTask(Task task) throws InvalidInputException {
-        if (tasks.get(task.getId()) == null) {
-            throw new InvalidInputException("Задача не найдена");
-        }
-        tasks.put(task.getId(), task);
-    }
-
+    @Override
     public void updateSubTask(SubTask subTask) throws InvalidInputException {
         if (subTasks.get(subTask.getId()) == null) {
             throw new InvalidInputException("Подзадача не найдена");
@@ -64,18 +76,22 @@ public class Manager {
         calculateEpicStatus(subTask.getLinkedEpicId());
     }
 
+    @Override
     public List<Epic> getAllEpics() {
         return new LinkedList<>(epics.values());
     }
 
+    @Override
     public List<Task> getAllTasks() {
         return new LinkedList<>(tasks.values());
     }
 
+    @Override
     public List<SubTask> getAllSubTasks() {
         return new LinkedList<>(subTasks.values());
     }
 
+    @Override
     public List<SubTask> getSubTasksByEpicId(Integer epicId) throws InvalidInputException {
         List<SubTask> allSubTasksListFromEpic = new LinkedList<>();
         if (epics.get(epicId) == null) {
@@ -87,42 +103,52 @@ public class Manager {
         return allSubTasksListFromEpic;
     }
 
+    @Override
     public Task getTaskById(Integer taskId) throws InvalidInputException {
         if (tasks.get(taskId) == null) {
             throw new InvalidInputException("Задача не найдена");
         }
+        historyManager.addTask(tasks.get(taskId));
         return tasks.get(taskId);
     }
 
+    @Override
     public Epic getEpicById(Integer epicId) throws InvalidInputException {
         if (epics.get(epicId) == null) {
             throw new InvalidInputException("Эпик не найден");
         }
+        historyManager.addTask(epics.get(epicId));
         return epics.get(epicId);
     }
 
+    @Override
     public SubTask getSubTaskById(Integer subTaskId) throws InvalidInputException {
         if (subTasks.get(subTaskId) == null) {
             throw new InvalidInputException("Подзадача не найдена");
         }
+        historyManager.addTask(subTasks.get(subTaskId));
         return subTasks.get(subTaskId);
     }
 
+    @Override
     public void deleteAllEpics() {
         epics.clear();
         deleteAllSubTasks();
     }
 
+    @Override
     public void deleteAllTasks() {
         tasks.clear();
     }
 
+    @Override
     public void deleteAllSubTasks() {
         subTasks.clear();
         deleteAllEpicSubTasks();
         calculateEpicStatus();
     }
 
+    @Override
     public void deleteEpicById(Integer epicId) throws InvalidInputException {
         if (epics.get(epicId) == null) {
             throw new InvalidInputException("Эпик не найден");
@@ -133,6 +159,7 @@ public class Manager {
         epics.remove(epicId);
     }
 
+    @Override
     public void deleteTaskById(Integer taskId) throws InvalidInputException {
         if (tasks.get(taskId) == null) {
             throw new InvalidInputException("Задача не найдена");
@@ -140,6 +167,7 @@ public class Manager {
         tasks.remove(taskId);
     }
 
+    @Override
     public void deleteSubTaskById(Integer subTaskId) throws InvalidInputException {
         if (subTasks.get(subTaskId) == null) {
             throw new InvalidInputException("Подзадача не найдена");
@@ -151,7 +179,7 @@ public class Manager {
     }
 
     private void calculateEpicStatus(Integer epicId) {
-        if(epics.get(epicId).getEpicSubTasks().isEmpty()) {
+        if (epics.get(epicId).getEpicSubTasks().isEmpty()) {
             epics.get(epicId).setStatus(Status.NEW);
             return;
         }
@@ -170,9 +198,9 @@ public class Manager {
         boolean isNew = false;
         boolean isInProgress = false;
         boolean isDone = false;
-        if(statusDone == 0 && statusInProgress == 0 && statusNew != 0) {
+        if (statusDone == 0 && statusInProgress == 0 && statusNew != 0) {
             isNew = true;
-        }  else if(statusDone != 0 && statusInProgress == 0 && statusNew == 0) {
+        } else if (statusDone != 0 && statusInProgress == 0 && statusNew == 0) {
             isDone = true;
             isNew = false;
             isInProgress = false;
@@ -213,5 +241,4 @@ public class Manager {
             epic.getEpicSubTasks().clear();
         }
     }
-
 }

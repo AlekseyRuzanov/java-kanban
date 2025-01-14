@@ -1,5 +1,7 @@
 package Tasks;
 
+import java.util.Objects;
+
 public class SubTask extends Task {
     protected Integer linkedEpicId;
 
@@ -23,5 +25,13 @@ public class SubTask extends Task {
                 ", status=" + status +
                 ", id=" + id +
                 '}' + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SubTask subTask = (SubTask) o;
+        return Objects.equals(name, subTask.name) && Objects.equals(description, subTask.description) && Objects.equals(status, subTask.status) && Objects.equals(id, subTask.id);
     }
 }

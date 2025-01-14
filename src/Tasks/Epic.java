@@ -29,4 +29,11 @@ public class Epic extends Task {
                 '}' + "\n";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Epic epic = (Epic) o;
+        return Objects.equals(name, epic.name) && Objects.equals(description, epic.description) && Objects.equals(status, epic.status) && Objects.equals(id, epic.id);
+    }
 }
